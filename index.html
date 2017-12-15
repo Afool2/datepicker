@@ -115,10 +115,18 @@
                 //月份最后一天是几号
                 lastDateOfMonth = lastDayOfMonth.getDate();
                 
-                for(var i = 0;i< 42;i++) {
+                // 日历最多42格
+                for(var i = 0; i < 42; i++) {
                     var date = i - weekDayOfFirstDay,
                         showDate = date,
                         thisMonth = month;
+                    //上一月
+                    if(date <= 0){
+                        thisMonth -= 1;
+                        showDate = lastDateOfLastMonth + date;
+                    }
+
+                    if(date >)
                 }
         }
     };
