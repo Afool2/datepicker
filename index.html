@@ -89,7 +89,7 @@
    
 <script   src="jq.js"></script>
 <script type="text/javascript">
-        
+var cl = console.log;   
 // calendar
 
 (function(){
@@ -115,19 +115,34 @@
                 //月份最后一天是几号
                 lastDateOfMonth = lastDayOfMonth.getDate();
                 
-                // 日历最多42格
-                for(var i = 0; i < 42; i++) {
-                    var date = i - weekDayOfFirstDay,
-                        showDate = date,
-                        thisMonth = month;
-                    //上一月
-                    if(date <= 0){
-                        thisMonth -= 1;
-                        showDate = lastDateOfLastMonth + date;
-                    }
-
-                    if(date >)
+            // 日历最多42格
+            for(var i = 1; i <= 42; i++) {
+                var date = i - weekDayOfFirstDay,
+                    showDate = date,
+                    thisMonth = month;
+                //上一月
+                if(date <= 0) {
+                    thisMonth -= 1;
+                    showDate = lastDateOfLastMonth + date;
                 }
+                // 下一月
+                if(date > lastDateOfMonth) {
+                    thisMonth += 1;
+                    showDate = date - lastDateOfMonth;
+                }
+                // 上一年12月
+                if(thisMonth == 0) thisMonth = 12;
+                // 下一年1月
+                if(thisMonth == 13) thisMonth = 1;
+
+                ret.push({
+                    month: thisMonth,
+                    date: date,
+                    showDate: showDate
+                });
+
+            }
+            return ret;
         }
     };
     
