@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <title>datepicker</title>
+    <style type="text/css">
+
+    
+    .ui-datepicker-wraper {
+        /*border: 1px solid #ccc;*/
+        width: 200px;
+        box-shadow: 2px 2px 2px 0 rgba(0,0,0,.1);
+    }
+    .ui-datepicker-wraper .ui-datepicker-header {
+        text-align: center;
+        background-color: #eee;
+        padding: 10px 0;
+    }
+    .ui-datepicker-wraper .ui-datepicker-header .ui-datepicker-btn {
+        font-family: serif;
+        color: #1abc9c;
+        text-decoration: none;
+    }
+    .ui-datepicker-wraper .ui-datepicker-header .ui-datepicker-curr-month {
+        margin: 0 20px;
+    }
+    .ui-datepicker-wraper .ui-datepicker-body table {
+        width: 100%;
+        border-collapse: collapse;
+        border-color: #f0f0f0;
+    }
+    .ui-datepicker-wraper .ui-datepicker-body table th,
+    .ui-datepicker-wraper .ui-datepicker-body table td {
+        border-color: #f0f0f0;
+    }
+    .ui-datepicker-wraper .ui-datepicker-body table td {
+        cursor: pointer;
+    }
+    
+    </style>
+
+</head>
+<body>
+  
+
+   <!-- calendar -->
+        <div class="ui-datepicker-wraper">
+            <div class="ui-datepicker-header">
+                <a href="#" class="ui-datepicker-btn ui-datepicker-btn-prev">&lt;</a>
+                <span class="ui-datepicker-curr-month">2017-12</span>
+                <a href="#" class="ui-datepicker-btn ui-datepicker-btn-next">&gt;</a>
+            </div>
+            <div class="ui-datepicker-body">
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>日</th>
+                            <th>一</th>
+                            <th>二</th>
+                            <th>三</th>
+                            <th>四</th>
+                            <th>五</th>
+                            <th>六</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+   <!-- calendar end -->
+   
+<script   src="jq.js"></script>
+<script type="text/javascript">
+        
+// calendar
+
+(function(){
+    var datePicker = {
+        getMonthData: function(year, month){
+            var ret = [];
+            // 如果没有传参数，从今天的日期对象获取年月
+            if(!year || !month) {
+                var today = new Date();
+                year = today.getFullYear();
+                month = today.getMonth() + 1;
+            }
+            // 月份的第一天日期对象
+            var firstDayOfMonth = new Date(year, month - 1, 1),
+                // 月份的第一天是星期几
+                weekDayOfFirstDay = firstDayOfMonth.getDay(),
+                // 上一个月的最后一天的日期对象
+                lastDayOfLastMonth = new Date(year,month - 1, 0),
+                // 上月最后一天是几号
+                lastDateOfLastMonth = lastDayOfLastMonth.getDate(),
+                // 月份的最后一天日期对象
+                lastDayOfMonth = new Date(year, month, 0),
+                //月份最后一天是几号
+                lastDateOfMonth = lastDayOfMonth.getDate();
+                
+                for(var i = 0;i< 42;i++) {
+                    var date = i - weekDayOfFirstDay,
+                        showDate = date,
+                        thisMonth = month;
+                }
+        }
+    };
+    
+    window.datePicker = datePicker;
+})();
+
+// calendar end
+
+
+ </script>
+
+
+</body>
+</html>
