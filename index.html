@@ -7,94 +7,82 @@
     <style type="text/css">
 
     
-    .ui-datepicker-wraper {
-        /*border: 1px solid #ccc;*/
+    .ui-datepicker-wrapper {
         width: 200px;
         box-shadow: 2px 2px 2px 0 rgba(0,0,0,.1);
+        display: none;
+        position: absolute;
     }
-    .ui-datepicker-wraper .ui-datepicker-header {
+    .ui-datepicker-wrapper-show {
+        display: block;
+    }
+    .ui-datepicker-wrapper .ui-datepicker-header {
         text-align: center;
         background-color: #eee;
         padding: 10px 0;
     }
-    .ui-datepicker-wraper .ui-datepicker-header .ui-datepicker-btn {
+    .ui-datepicker-wrapper .ui-datepicker-header .ui-datepicker-btn {
         font-family: serif;
         color: #1abc9c;
         text-decoration: none;
     }
-    .ui-datepicker-wraper .ui-datepicker-header .ui-datepicker-curr-month {
+    .ui-datepicker-wrapper .ui-datepicker-header .ui-datepicker-curr-month {
         margin: 0 20px;
     }
-    .ui-datepicker-wraper .ui-datepicker-body table {
+    .ui-datepicker-wrapper .ui-datepicker-body table {
         width: 100%;
         border-collapse: collapse;
         border-color: #f0f0f0;
+        text-align: center;
     }
-    .ui-datepicker-wraper .ui-datepicker-body table th,
-    .ui-datepicker-wraper .ui-datepicker-body table td {
+    .ui-datepicker-wrapper .ui-datepicker-body table th {
+        font-size: 14px;
+        height: 30px;
+        line-height: 30px;
+        background-color: #fafcff;
+        border-color: #fafafa;
+    }
+    .ui-datepicker-wrapper .ui-datepicker-body table td {
+        font-size: 14px;
+
         border-color: #f0f0f0;
-    }
-    .ui-datepicker-wraper .ui-datepicker-body table td {
         cursor: pointer;
+    }
+    .datepicker {
+        text-indent: 5px;
+        height: 20px;
+        line-height: 20px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-left: 200px;
+    }
+    .datepicker:focus {
+        outline: 0;
+        border-color: #1abc9c;
+
     }
     
     </style>
 
 </head>
 <body>
-  
-
+ 
+    
    <!-- calendar -->
-        <div class="ui-datepicker-wraper">
-            <div class="ui-datepicker-header">
-                <a href="#" class="ui-datepicker-btn ui-datepicker-btn-prev">&lt;</a>
-                <span class="ui-datepicker-curr-month">2017-12</span>
-                <a href="#" class="ui-datepicker-btn ui-datepicker-btn-next">&gt;</a>
-            </div>
-            <div class="ui-datepicker-body">
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>日</th>
-                            <th>一</th>
-                            <th>二</th>
-                            <th>三</th>
-                            <th>四</th>
-                            <th>五</th>
-                            <th>六</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+   
+       
+        <input type="text" class="datepicker">
+  
    <!-- calendar end -->
    
-<script   src="jq.js"></script>
 <script type="text/javascript">
 var cl = console.log;   
 // calendar
 
 (function(){
+    var monthData;
     var datePicker = {
-        getMonthData: function(year, month){
+        getMonthData: function(year, month) {
             var ret = [];
             // 如果没有传参数，从今天的日期对象获取年月
             if(!year || !month) {
@@ -142,13 +130,88 @@ var cl = console.log;
                 });
 
             }
-            return ret;
+            return {
+                year: year,
+                month: month,
+                days: ret
+            };
+        },
+        buildUi: function(year, month) {
+            monthData = this.getMonthData(year, month);
+            var html = '<div class="ui-datepicker-header">'+
+                            '<a href="#" class="ui-datepicker-btn ui-datepicker-btn-prev">&lt;</a>'+
+                            '<span class="ui-datepicker-curr-month">' + 
+                                monthData.year + '-' + monthData.month + 
+                            '</span>'+
+                            '<a href="#" class="ui-datepicker-btn ui-datepicker-btn-next">&gt;</a>'+
+                        '</div>'+
+                        '<div class="ui-datepicker-body">'+
+                            '<table border="1">'+
+                                '<thead>'+
+                                    '<tr>'+
+                                        '<th>日</th>'+
+                                        '<th>一</th>'+
+                                        '<th>二</th>'+
+                                        '<th>三</th>'+
+                                        '<th>四</th>'+
+                                        '<th>五</th>'+
+                                        '<th>六</th>'+
+                                    '</tr>'+
+                                '</thead>'+
+                                '<tbody>';
+            for(var i = 0; i < monthData.days.length; i++) {
+                if(i % 7 == 0) html += '<tr>';
+                html += '<td>' + monthData.days[i].showDate + '</td>';
+                if(i % 7 == 6) html += '</tr>';
+            }
+            html +=             '</tbody>' +
+                            '</table>' +
+                        '</div>';
+            return html;
+        },
+        render: function(direction) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'ui-datepicker-wrapper';
+            wrapper.innerHTML = this.buildUi();
+            document.body.appendChild(wrapper);
+        },
+        init: function(input) {
+            this.render();
+            var inputDom = document.querySelector(input),
+                isOpen = false;
+            inputDom.addEventListener('click', function() {
+
+                if(isOpen) {
+                    wrapper.classList.remove('ui-datepicker-wrapper-show');
+                    isOpen = false;
+                }else{
+                    wrapper.classList.add('ui-datepicker-wrapper-show');
+                    var top = inputDom.offsetTop,
+                        left = inputDom.offsetLeft,
+                        height = inputDom.offsetHeight;
+                    wrapper.style.top = top + height + 2 + 'px';
+                    wrapper.style.left= left + 'px';
+                    isOpen = true;
+                }
+            });
+            
+            wrapper.addEventListener('click', function() {
+                var target = event.target;
+                if(target.name != 'A') return;
+                if(target.classList.contains('ui-datepicker-btn-prev')){
+                    this.render('prev');
+                }else if(target.classList.contains('ui-datepicker-btn-next')){
+                    this.render('next');
+                }
+
+            })
         }
+ 
     };
     
     window.datePicker = datePicker;
 })();
-
+datePicker.init('input')
 // calendar end
 
 
