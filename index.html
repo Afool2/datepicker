@@ -170,7 +170,7 @@ var cl = console.log;
                                     '<tbody>';
                 for(var i = 0; i < monthData.days.length; i++) {
                     if(i % 7 == 0) html += '<tr>';
-                    html += '<td>' + monthData.days[i].showDate + '</td>';
+                    html += '<td data-date=' + monthData.days[i].date + '>' + monthData.days[i].showDate + '</td>';
                     if(i % 7 == 6) html += '</tr>';
                 }
                 html +=             '</tbody>' +
@@ -221,7 +221,6 @@ var cl = console.log;
                 
                 wrapper.addEventListener('click', function() {
                     var target = event.target;
-
                     if(target.tagName != 'A') return;
                     if(target.classList.contains('ui-datepicker-btn-prev')){
                         datePicker.render('prev');
@@ -229,6 +228,16 @@ var cl = console.log;
                         datePicker.render('next');
                     }
                     
+                });
+                wrapper.addEventListener('click', function() {
+                    var target = event.target;
+
+                    if(target.tagName != 'TD') return;
+                    var date = new Date(monthData.year, monthData.month - 1, target.dataset.date);
+                    inputDom.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                    wrapper.classList.remove('ui-datepicker-wrapper-show');
+                    isOpen = false;
+
                 });
             }
      
