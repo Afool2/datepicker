@@ -53,13 +53,16 @@
         border-color: #f0f0f0;
         cursor: pointer;
     }
+    .ui-datepicker-wrapper .ui-datepicker-body table .lightColor{
+        color: #aaa;
+    }
     .datepicker {
         text-indent: 5px;
         height: 20px;
         line-height: 20px;
         border-radius: 4px;
         border: 1px solid #ccc;
-        margin-left: 200px;
+        margin-left: 100px;
     }
     .datepicker:focus {
         outline: 0;
@@ -71,14 +74,12 @@
 
 </head>
 <body>
- 
     
-   <!-- calendar -->
-   
+    <!-- calendar -->
        
-        <input type="text" class="datepicker">
+    <input type="text" class="datepicker">
   
-   <!-- calendar end -->
+    <!-- calendar end -->
    
 <script type="text/javascript">
 var cl = console.log;   
@@ -87,18 +88,15 @@ var cl = console.log;
 (function(){
     var monthData,wrapper,
         datePicker = {
+
+            //获得日期相关数据
             getMonthData: function(year, month) {
                 var ret = [];
-                // 如果没有传参数，从今天的日期对象获取年月
-                if(year == undefined || month == undefined) {
-                    var today = new Date();
-                    year = today.getFullYear();
-                    month = today.getMonth() + 1;
-                }
+                
                 // 月份的第一天日期对象
                 var firstDayOfMonth = new Date(year, month - 1, 1);
 
-                //因为render函数传来的month参数可能<1或>12,所以要由日期对象重新获取年月
+                //因为render函数传来的month参数可能小于1或大于12,所以要由日期对象重新获取年月
                 year = firstDayOfMonth.getFullYear();
                 month = firstDayOfMonth.getMonth() + 1;
 
@@ -145,12 +143,14 @@ var cl = console.log;
                     days: ret
                 };
             },
+
+            //构建ui组件
             buildUi: function(year, month) {
                 monthData = this.getMonthData(year, month);
                 var html = '<div class="ui-datepicker-header">'+
                                 '<a href="#" class="ui-datepicker-btn ui-datepicker-btn-prev">&lt;</a>'+
                                 '<span class="ui-datepicker-curr-month">' + 
-                                    monthData.year + ' - ' + monthData.month + 
+                                    monthData.year + ' - ' + this.addZero(monthData.month) + 
                                 '</span>'+
                                 '<a href="#" class="ui-datepicker-btn ui-datepicker-btn-next">&gt;</a>'+
                             '</div>'+
@@ -170,7 +170,7 @@ var cl = console.log;
                                     '<tbody>';
                 for(var i = 0; i < monthData.days.length; i++) {
                     if(i % 7 == 0) html += '<tr>';
-                    html += '<td data-date=' + monthData.days[i].date + '>' + monthData.days[i].showDate + '</td>';
+                    html += '<td class='+ (monthData.days[i].date == monthData.days[i].showDate ? '""' : 'lightColor') + ' data-date=' + monthData.days[i].date + '>' + monthData.days[i].showDate + '</td>';
                     if(i % 7 == 6) html += '</tr>';
                 }
                 html +=             '</tbody>' +
@@ -178,11 +178,21 @@ var cl = console.log;
                             '</div>';
                 return html;
             },
+
+            //渲染dom
             render: function(direction) {
-                var year,month;
+                var year,month,
+                    // 今天的年月日
+                    dateObjOfToday= new Date(),
+                    thisYear = dateObjOfToday.getFullYear(),
+                    thisMonth = dateObjOfToday.getMonth() + 1,
+                    today = dateObjOfToday.getDate();
                 if(monthData) {
                     year = monthData.year;
                     month = monthData.month;
+                }else{
+                    year = thisYear;
+                    month = thisMonth;
                 }
                
                 if(direction == 'prev'){
@@ -191,14 +201,38 @@ var cl = console.log;
                     month++;
                 }
                 if(!wrapper){
-
                     wrapper = document.createElement('div');
                     wrapper.className = 'ui-datepicker-wrapper';
                     document.body.appendChild(wrapper);
                 }
                 wrapper.innerHTML = this.buildUi(year, month);
-                
+                 
+                //日历上单元格的年月日等于今天时，该单元格加上特定样式
+                if(monthData.year == thisYear && monthData.month == thisMonth) {
+                    var tds = document.querySelectorAll('td');
+                    for(var i = 0; i < tds.length; i ++) {
+                        if(tds[i].className != 'lightColor' && tds[i].innerText == today) {
+                            var style = tds[i].style;
+                            style.backgroundColor = '#0af';
+                            style.color = '#fff';
+                            break;
+                        }
+                    }
+                }
+  
             },
+
+            //小于10的月或日前加个0
+            addZero: function(num) {
+                return num < 10 ? '0' + num : num;
+            },
+
+            //日期格式化
+            dateFormat: function(dateObj) {
+                return dateObj.getFullYear() + '-' + this.addZero(dateObj.getMonth() + 1) + '-' + this.addZero(dateObj.getDate());
+            },
+
+            //初始化
             init: function(input) {
                 this.render();
                 var inputDom = document.querySelector(input),
@@ -207,18 +241,17 @@ var cl = console.log;
 
                     if(isOpen) {
                         wrapper.classList.remove('ui-datepicker-wrapper-show');
-                        isOpen = false;
                     }else{
                         wrapper.classList.add('ui-datepicker-wrapper-show');
                         var top = inputDom.offsetTop,
                             left = inputDom.offsetLeft,
                             height = inputDom.offsetHeight;
                         wrapper.style.top = top + height + 2 + 'px';
-                        wrapper.style.left= left + 'px';
-                        isOpen = true;
+                        wrapper.style.left = left + 'px';
                     }
+                    isOpen = !isOpen;
                 });
-                
+                // 点击箭头切换月份
                 wrapper.addEventListener('click', function() {
                     var target = event.target;
                     if(target.tagName != 'A') return;
@@ -229,22 +262,24 @@ var cl = console.log;
                     }
                     
                 });
+                // 点击日期单元格把日期显示到文本框
                 wrapper.addEventListener('click', function() {
                     var target = event.target;
-
                     if(target.tagName != 'TD') return;
                     var date = new Date(monthData.year, monthData.month - 1, target.dataset.date);
-                    inputDom.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                    inputDom.value = datePicker.dateFormat(date);
                     wrapper.classList.remove('ui-datepicker-wrapper-show');
                     isOpen = false;
-
                 });
             }
+
+            
      
         };
     
     window.datePicker = datePicker;
 })();
+
 datePicker.init('input');
 // calendar end
 
